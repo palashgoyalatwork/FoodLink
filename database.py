@@ -53,11 +53,29 @@ def add_donation(food_name, quantity, donor_name, location, pickup_deadline):
     conn.close()
 
 
+from datetime import date
+import sqlite3
+
+
 def get_donations():
+    print("✅ get_donations() is running")
+
     conn = sqlite3.connect("foodlink.db")
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM donations")
+    cursor.execute("""
+    DELETE FROM donations
+    WHERE DATE(pickup_deadline) < DATE('now')
+    """)
+
+    conn.commit()
+
+    cursor.execute("""
+    SELECT *
+    FROM donations
+    ORDER BY pickup_deadline ASC
+    """)
+
     data = cursor.fetchall()
 
     conn.close()
